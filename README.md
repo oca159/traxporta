@@ -1,7 +1,7 @@
 # Url Shortener API
 
 # Pre-requisites
-- python3.8+
+- python3.11+
 - nodejs 16+
 - yarn 1.22+
 

@@ -1,7 +1,7 @@
 try:
-  import unzip_requirements
+    import unzip_requirements
 except ImportError:
-  pass
+    pass
 
 from fastapi import FastAPI
 from mangum import Mangum
@@ -16,7 +16,7 @@ def create_app() -> FastAPI:
     db = container.db()
     db.create_database()
 
-    app = FastAPI(title='Url shortener API')
+    app = FastAPI(title="Url shortener API")
     app.container = container
     app.include_router(urls.router)
 
