@@ -1,0 +1,13 @@
+{
+  "name": "url-shortener-api",
+  "version": "1.0.0",
+  "description": "An API to short urls",
+  "main": "index.js",
+  "repository": "git@github.com:oca159/traxporta.git",
+  "author": "Osvaldo Cordova Aburto <oca159@hotmail.es>",
+  "license": "MIT",
+  "dependencies": {
+    "serverless": "^3.36.0",
+    "serverless-python-requirements": "^6.0.1"
+  }
+}
