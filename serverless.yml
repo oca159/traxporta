@@ -1,0 +1,55 @@
+service: url-shortener-api
+
+frameworkVersion: '3'
+
+configValidationMode: error
+
+provider:
+  name: aws
+  deploymentMethod: direct
+  region: us-west-2
+  stage: ${env:STAGE, 'dev'}
+
+  environment:
+    ENV: ${self:provider.stage}
+
+plugins:
+  - serverless-python-requirements
+
+
+package:
+  exclude:
+    - '**'
+  include:
+    - './application/**'
+    - './domain/**'
+    - './infrastructure/**'
+    - - './*.py'
+custom:
+  config:
+    dev:
+      db_url: '' # TODO: add dev db url
+    stg:
+      db_url: '' # TODO: add dev db url
+    prd:
+      db_url: '' # TODO: add dev db url
+  namePrefix: url-shortener-api
+  pythonRequirements:
+    zip: true
+    slim: true
+
+functions:
+  api:
+    name: ${self:custom.namePrefix}-${self:provider.stage}
+    description: URL Shortener API
+    handler: main.handler
+    runtime: python3.8
+    events:
+      - http: ANY /
+      - http:
+          path: /{proxy+}
+          method: ANY
+    memorySize: 1024
+    timeout: 30
+    environment:
+      DB_URL: ${self:custom.config.${self:provider.stage}.db_url}
