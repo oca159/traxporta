@@ -1,3 +1,5 @@
+import json
+from datetime import datetime
 import pytest
 
 from fastapi.testclient import TestClient
@@ -21,9 +23,23 @@ def url_repository_mock(mocker):
 
 def test_get_urls(client, url_repository_mock):
     # Arrange
+    now = datetime.now()
+    now_str = now.strftime('%Y-%m-%dT%H:%M:%S.%f')
     url_repository_mock.get_urls.return_value = [
-        Url(id=1, name="osvaldo", url_number="123", balance=100),
-        Url(id=2, name="ana", url_number="567", balance=50),
+        Url(
+            id=1,
+            original="https://www.google.com.mx/maps",
+            shortcode="https://s.com/gm",
+            created_at=now,
+            updated_at=now
+        ),
+        Url(
+            id=2,
+            original="https://www.facebook.com",
+            shortcode="https://s.com/f",
+            created_at=now,
+            updated_at=now
+        ),
     ]
 
     # Act
@@ -33,15 +49,34 @@ def test_get_urls(client, url_repository_mock):
     # Assert
     assert response.status_code == 200
     assert response.json() == [
-        {"id": 1, "name": "osvaldo", "url_number": "123", "balance": 100},
-        {"id": 2, "name": "ana", "url_number": "567", "balance": 50},
+        {
+            "id": 1,
+            "original": "https://www.google.com.mx/maps",
+            "shortcode": "https://s.com/gm",
+            "created_at": now_str,
+            "updated_at": now_str,
+        },
+        {
+            "id": 2,
+            "original": "https://www.facebook.com",
+            "shortcode": "https://s.com/f",
+            "created_at": now_str,
+            "updated_at": now_str,
+        },
     ]
 
 
-def test_get_url(client, url_repository_mock):
+def test_get_url_by_id(client, url_repository_mock):
     # Arrange
-    url_repository_mock.get_url_by_id.return_value = Url(id=1, name="osvaldo", url_number="123",
-                                                                     balance=100)
+    now = datetime.now()
+    now_str = now.strftime('%Y-%m-%dT%H:%M:%S.%f')
+    url_repository_mock.get_url_by_id.return_value = Url(
+        id=1,
+        original="https://www.google.com.mx/maps",
+        shortcode="https://s.com/gm",
+        created_at=now,
+        updated_at=now
+    )
 
     # Act
     with app.container.url_repository.override(url_repository_mock):
@@ -49,51 +84,103 @@ def test_get_url(client, url_repository_mock):
 
     # Assert
     assert response.status_code == 200
-    assert response.json() == {"id": 1, "name": "osvaldo", "url_number": "123", "balance": 100}
+    assert response.json() == {
+        "id": 1,
+        "original": "https://www.google.com.mx/maps",
+        "shortcode": "https://s.com/gm",
+        "created_at": now_str,
+        "updated_at": now_str,
+    }
 
 
-def test_get_url_balance(client, url_repository_mock):
+def test_get_url_by_shortcode(client, url_repository_mock):
     # Arrange
-    url_repository_mock.get_url_by_id.return_value = Url(id=1, name="osvaldo", url_number="123",
-                                                                     balance=100)
+    now = datetime.now()
+    now_str = now.strftime('%Y-%m-%dT%H:%M:%S.%f')
+    url_repository_mock.get_url_by_shortcode.return_value = Url(
+        id=1,
+        original="https://www.google.com.mx/maps",
+        shortcode="https://s.com/gm",
+        created_at=now,
+        updated_at=now
+    )
 
     # Act
     with app.container.url_repository.override(url_repository_mock):
-        response = client.get("/urls/1/balance")
+        response = client.get("/urls", params={"shortcode": "https://s.com/gm"})
 
     # Assert
     assert response.status_code == 200
-    assert response.json() == 100
+    assert response.json() == [
+        {
+            "id": 1,
+            "original": "https://www.google.com.mx/maps",
+            "shortcode": "https://s.com/gm",
+            "created_at": now_str,
+            "updated_at": now_str,
+        }
+    ]
 
 
 def test_create_url(client, url_repository_mock):
     # Arrange
-    url_repository_mock.create_url.return_value = Url(id=1, name="osvaldo", url_number="123",
-                                                                     balance=100)
-    # Act
+    now = datetime.now()
+    now_str = now.strftime('%Y-%m-%dT%H:%M:%S.%f')
+    url_repository_mock.create_url.return_value = Url(
+        id=1,
+        original="https://www.google.com.mx/maps",
+        shortcode="https://s.com/gm",
+        created_at=now,
+        updated_at=now
+    )
+
     with app.container.url_repository.override(url_repository_mock):
-        response = client.post("/urls", json={"name": "osvaldo", "url_number": "123", "balance": 100})
+        response = client.post("/urls", json={"original": "https://www.google.com.mx/maps"})
 
     # Assert
     assert response.status_code == 200
-    assert response.json() == {"id": 1, "name": "osvaldo", "url_number": "123", "balance": 100}
+    assert response.json() == {
+        "id": 1,
+        "original": "https://www.google.com.mx/maps",
+        "shortcode": "https://s.com/gm",
+        "created_at": now_str,
+        "updated_at": now_str,
+    }
 
 
 def test_update_url(client, url_repository_mock):
     # Arrange
-    url_repository_mock.get_url_by_id.return_value = Url(id=1, name="osvaldo", url_number="123",
-                                                                     balance=100)
-    url_repository_mock.update_url.return_value = Url(id=1, name="osvaldo", url_number="456",
-                                                                  balance=100)
+    now = datetime.now()
+    now_str = now.strftime('%Y-%m-%dT%H:%M:%S.%f')
+    url_repository_mock.get_url_by_id.return_value = Url(
+        id=1,
+        original="https://www.google.com.mx/maps",
+        shortcode="https://s.com/gm",
+        created_at=now,
+        updated_at=now
+    )
+    url_repository_mock.update_url.return_value = Url(
+        id=1,
+        original="https://www.facebook.com",
+        shortcode="https://s.com/f",
+        created_at=now,
+        updated_at=now
+    )
 
     # Act
     with app.container.url_repository.override(url_repository_mock):
         response = client.patch("/urls/1",
-                                json={"id": 1, "name": "osvaldo", "url_number": "456", "balance": 100})
+                                json={"id": 1, "original": "https://www.facebook.com", "shortcode": "https://s.com/f"})
 
     # Assert
     assert response.status_code == 200
-    assert response.json() == {"id": 1, "name": "osvaldo", "url_number": "456", "balance": 100}
+    assert response.json() == {
+        "id": 1,
+        "original": "https://www.facebook.com",
+        "shortcode": "https://s.com/f",
+        "created_at": now_str,
+        "updated_at": now_str,
+    }
 
 
 def test_delete_url(client, url_repository_mock):
